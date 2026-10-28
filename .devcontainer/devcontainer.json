@@ -1,0 +1,24 @@
+{
+  // Ambiente de desarrollo como codigo (modulo 1). Lo abre VS Code
+  // ("Reopen in Container") o GitHub Codespaces, y todos trabajan sobre las
+  // mismas versiones de JDK, Maven y Docker.
+  "name": "TYVS - Ambientes de prueba",
+  "image": "mcr.microsoft.com/devcontainers/java:1-17-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "none",
+      "installMaven": "true",
+      "mavenVersion": "3.9.9"
+    },
+    // Docker dentro del contenedor: lo necesitan Testcontainers y
+    // docker compose.
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts": [8080, 5432],
+  "postCreateCommand": "cd registraduria && mvn -B -q dependency:go-offline",
+  "customizations": {
+    "vscode": {
+      "extensions": ["vscjava.vscode-java-pack"]
+    }
+  }
+}

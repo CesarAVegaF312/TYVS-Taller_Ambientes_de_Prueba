@@ -1,0 +1,46 @@
+# =====================================================================
+# Ambiente local completo: la Registraduria en perfil prod + PostgreSQL.
+#
+#   cp .env.ejemplo .env          # y cambie los valores
+#   docker compose up --build --wait
+#
+# --wait no devuelve el control hasta que los healthchecks esten en verde. Sin
+# healthchecks, "arrancado" significa "el proceso existe", no "responde".
+# =====================================================================
+services:
+  db:
+    # Misma imagen que Imagenes.POSTGRES en las pruebas (AmbienteFijadoTest).
+    image: postgres:16.4-alpine
+    environment:
+      POSTGRES_DB: registraduria
+      POSTGRES_USER: ${DB_USER:?defina DB_USER en .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD en .env}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: ./registraduria
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://db:5432/registraduria
+      DB_USER: ${DB_USER:?defina DB_USER en .env}
+      DB_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD en .env}
+      REGISTRADURIA_CLAVE_AUDITORIA: ${REGISTRADURIA_CLAVE_AUDITORIA:?defina REGISTRADURIA_CLAVE_AUDITORIA en .env}
+    ports:
+      - "8080:8080"
+    depends_on:
+      # Sin "condition", depends_on solo ordena el ARRANQUE: la app podria
+      # intentar conectarse mientras PostgreSQL todavia se inicializa.
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health/readiness"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
