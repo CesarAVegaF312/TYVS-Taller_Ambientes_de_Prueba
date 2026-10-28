@@ -30,6 +30,34 @@ jobs:
         working-directory: registraduria
 
   # ---------------------------------------------------------------------------
+  # El ambiente de DESARROLLO (devcontainer) tambien se prueba: se construye y
+  # se corre la suite dentro de el. Si una imagen o feature cambia por fuera
+  # (deriva, modulo 1), este job es el primero en enterarse.
+  # ---------------------------------------------------------------------------
+  devcontainer:
+    name: Devcontainer se construye y la suite pasa adentro
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir el devcontainer
+        run: |
+          set -o pipefail
+          npx -y @devcontainers/cli@0.89.0 up --workspace-folder . 2>&1 | tee construccion.log
+      - name: Correr la suite dentro del devcontainer
+        run: |
+          set -o pipefail
+          npx -y @devcontainers/cli@0.89.0 exec --workspace-folder . bash -lc "cd registraduria && mvn -B verify" 2>&1 | tee suite.log
+      # Si algo falla, las lineas de error se publican como anotaciones del
+      # check, visibles en el PR sin abrir el log completo.
+      - name: Mostrar el error en el PR
+        if: failure()
+        run: |
+          for f in construccion.log suite.log; do
+            [ -f "$f" ] && grep -v '^\s*$' "$f" | grep -i -E 'error|fail|unable|denied|not found|E: ' | tail -n 15 | while IFS= read -r l; do echo "::error title=$f::${l:0:900}"; done
+          done
+          true
+
+  # ---------------------------------------------------------------------------
   # El ambiente completo: se valida el compose, se construye la imagen, se
   # levanta con sus healthchecks y se le pasa el smoke test desde fuera.
   # ---------------------------------------------------------------------------

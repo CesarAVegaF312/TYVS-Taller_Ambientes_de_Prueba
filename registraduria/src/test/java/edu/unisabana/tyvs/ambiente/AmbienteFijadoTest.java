@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * MODULO 1 — El ambiente tambien se prueba.
  *
  * El ambiente de este taller esta escrito como codigo: docker-compose.yml,
- * registraduria/Dockerfile y .devcontainer/devcontainer.json. Y el codigo que
+ * registraduria/Dockerfile y .devcontainer/Dockerfile. Y el codigo que
  * nadie verifica se degrada. La degradacion tipica de un ambiente se llama
  * DERIVA: una imagen sin version fija ("postgres:latest") que hoy es la 16 y el
  * mes que viene la 17, sin que nadie haya cambiado una linea del repositorio.
@@ -33,7 +33,6 @@ class AmbienteFijadoTest {
 
     private static final Pattern IMAGE_COMPOSE = Pattern.compile("(?m)^\\s*image:\\s*\"?([^\"\\s#]+)");
     private static final Pattern FROM_DOCKERFILE = Pattern.compile("(?mi)^FROM\\s+(\\S+)");
-    private static final Pattern IMAGE_DEVCONTAINER = Pattern.compile("\"image\"\\s*:\\s*\"([^\"]+)\"");
 
     @Test
     void lasImagenesDelComposeTienenVersionExplicita() throws IOException {
@@ -51,8 +50,10 @@ class AmbienteFijadoTest {
 
     @Test
     void elDevcontainerNoUsaLatest() throws IOException {
-        List<String> imagenes = buscar(IMAGE_DEVCONTAINER, leer(".devcontainer/devcontainer.json"));
-        assertEquals(1, imagenes.size(), "devcontainer.json deberia declarar una imagen");
+        // devcontainer.json construye desde .devcontainer/Dockerfile: la imagen
+        // base es el FROM de ese archivo.
+        List<String> imagenes = buscar(FROM_DOCKERFILE, leer(".devcontainer/Dockerfile"));
+        assertEquals(1, imagenes.size(), ".devcontainer/Dockerfile deberia tener un FROM");
         exigirVersionFija(imagenes.get(0));
     }
 

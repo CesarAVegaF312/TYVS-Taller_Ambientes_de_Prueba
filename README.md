@@ -177,6 +177,16 @@ Docker) y falla si:
 > todo tiene un costo —hay que actualizar a mano—, pero ese costo se paga
 > cuando usted decide, no cuando la imagen cambia sola.
 
+> **Un caso real, de este mismo curso.** Al preparar los devcontainers de los
+> talleres, la etiqueta `mcr.microsoft.com/devcontainers/java:1-17-bookworm`
+> traía configurado el repositorio apt de Yarn con una clave GPG que ya no era
+> válida, y la feature de Docker falló al instalarse. Ningún archivo del
+> repositorio había cambiado: cambió algo **de afuera** de lo que el ambiente
+> dependía. La corrección está en [`.devcontainer/Dockerfile`](.devcontainer/Dockerfile),
+> y la lección es que fijar versiones reduce la deriva, pero no la elimina: el
+> ambiente también necesita una prueba que lo construya con regularidad (lo
+> hace el workflow de CI).
+
 **Ejercicio.** Provoque la deriva de verdad:
 
 1. Cambie la imagen de PostgreSQL del compose a `postgres:latest` y ejecute
