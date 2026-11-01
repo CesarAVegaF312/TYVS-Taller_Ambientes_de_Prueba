@@ -5,7 +5,7 @@ import edu.unisabana.tyvs.ambiente.Imagenes;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
@@ -26,13 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Testcontainers(disabledWithoutDocker = true)
 class ContenedorCompartidoIT {
 
-    private static PostgreSQLContainer<?> postgres;
+    private static PostgreSQLContainer postgres;
     private static long msDeArranque;
 
     @BeforeAll
     static void arrancarUnaSolaVez() {
         long inicio = System.nanoTime();
-        postgres = new PostgreSQLContainer<>(DockerImageName.parse(Imagenes.POSTGRES));
+        postgres = new PostgreSQLContainer(DockerImageName.parse(Imagenes.POSTGRES));
         postgres.start();
         msDeArranque = (System.nanoTime() - inicio) / 1_000_000;
     }

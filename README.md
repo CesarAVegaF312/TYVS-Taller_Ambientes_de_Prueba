@@ -59,9 +59,8 @@ reglas ya implementadas (`VALID`, `DUPLICATED`, `UNDERAGE`, `INVALID_AGE`,
 `DEAD`, `INVALID`). **La lógica no es el objeto de estudio: lo son los
 ambientes donde corre.**
 
-Este taller usa **Spring Boot 3.5** y Java 17, a diferencia de los anteriores
-(Spring Boot 2.7). No es un detalle: la versión del framework también es parte
-del ambiente.
+Este taller usa **Spring Boot 4.1** y Java 17. No es un detalle: la versión
+del framework también es parte del ambiente, y fijarla es el tema del módulo 1.
 
 ```text
 .

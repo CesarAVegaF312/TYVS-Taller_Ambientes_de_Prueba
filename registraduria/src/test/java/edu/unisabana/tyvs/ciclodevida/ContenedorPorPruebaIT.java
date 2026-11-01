@@ -6,7 +6,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
@@ -32,12 +32,12 @@ class ContenedorPorPruebaIT {
     private static long msTotalesDeArranque;
     private static int arranques;
 
-    private PostgreSQLContainer<?> postgres;
+    private PostgreSQLContainer postgres;
 
     @BeforeEach
     void arrancarUnContenedorNuevo() {
         long inicio = System.nanoTime();
-        postgres = new PostgreSQLContainer<>(DockerImageName.parse(Imagenes.POSTGRES));
+        postgres = new PostgreSQLContainer(DockerImageName.parse(Imagenes.POSTGRES));
         postgres.start();
         msTotalesDeArranque += (System.nanoTime() - inicio) / 1_000_000;
         arranques++;
